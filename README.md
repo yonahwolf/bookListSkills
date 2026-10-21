@@ -1,71 +1,76 @@
 # 📚 Podcast Book Finder
 
-**Turn any podcast's guest list into a curated reading list — with library availability and Amazon purchase links.**
+**Turn the guest lists of the podcasts you follow into a reading list, with library availability, optional holds, and Amazon links. Run it on demand or on a schedule.**
 
 Created by [Yonah Wolf](https://yonah.name)
 
 ---
 
-## What It Does
+## What it does
 
-You give it a podcast name and a timeframe. It searches the web, identifies which guests are authors, finds their books, and produces a clean reading list. Optionally, it can:
+- **First-time setup** asks which podcasts you follow and, optionally, which library you use. Nothing is preloaded; it finds each show's episode archive and your library's catalog and digital lending platforms (Libby/OverDrive, Hoopla, and others) itself.
+- **Finds author-guests** in recent episodes and the books they wrote.
+- **Checks your library** for print, ebook and audiobook availability.
+- **Places holds** when your library can be reached through an MCP server. During setup it looks for one (already-connected tools, your AI app's connector directory, the MCP registry and the web) and tells you what it found. It never installs anything or handles your library card itself, and by default it asks before every hold.
+- **Remembers what it has shown you**, so each run reports only new books.
+- **Runs on a schedule** (weekly by default) in Claude, Codex or ChatGPT.
+- **Optional Amazon links** for each book.
 
-- **Check your local library** for availability (physical + digital via Libby/OverDrive)
-- **Include Amazon purchase links** for each book
+## Contents
 
-It works with any interview-format podcast — Joe Rogan, Huberman Lab, Diary of a CEO, Tim Ferriss, WHOOP, Danger Close, or anything else.
+| Path | For | What it is |
+|------|-----|------------|
+| [`podcast-book-finder/`](podcast-book-finder/) | **Claude** and **Codex** | An Agent Skill: `SKILL.md` plus reference files for setup, library holds and scheduling, and an example config. |
+| [`book_list_prompt.md`](book_list_prompt.md) | **ChatGPT, Gemini, or any assistant** | A single portable prompt with the same setup and run flow. Paste it into a chat, project or custom GPT. |
+| [`airline/`](airline/) | Claude | A separate flight-search skill. |
 
-## Two Versions
+## Install and run
 
-| File | Best For | How to Use |
-|------|----------|------------|
-| `SKILL.md` | **Claude** (Anthropic) | Save to your Claude skills directory at `/mnt/skills/user/podcast-book-finder/SKILL.md`. Claude will auto-discover it whenever you ask for podcast book recommendations. |
-| `PROMPT_PORTABLE.md` | **ChatGPT, Gemini, Claude, or any AI** | Copy-paste the entire file as your first message in a new conversation. Then follow up with your request. |
+### Claude (desktop app or Claude Code)
 
-## Example Prompts
+```bash
+cp -R podcast-book-finder ~/.claude/skills/
+```
 
-Once the skill/prompt is loaded, just ask naturally:
+Then ask: *"Set up the podcast book finder."* After setup: *"Run my podcast book list"*, or *"Run the podcast book finder every Monday at 8am."*
 
-> *"Find me health and nutrition books from Huberman Lab guests in 2024-2025."*
+In the Claude web or desktop app you can also upload the `podcast-book-finder` folder (zipped) as a skill under **Settings → Capabilities**.
 
-> *"What books have Joe Rogan's guests written this year? Check the Chicago Public Library."*
+### Codex (app or CLI)
 
-> *"Give me a reading list from Diary of a CEO and Mel Robbins Podcast guests with Amazon links."*
+```bash
+cp -R podcast-book-finder ~/.codex/skills/
+```
 
-> *"Find books from Danger Close podcast guests that are available at the LA Public Library. Include Amazon links."*
+Then: *"$podcast-book-finder set up"*, and later *"$podcast-book-finder run"*.
 
-## Supported Podcasts
+### ChatGPT and other assistants
 
-Works with any podcast, but these are pre-loaded with archive URLs for faster results:
+Paste [`book_list_prompt.md`](book_list_prompt.md) into a new chat (or a project's instructions) and follow the setup questions. Save the config block it prints at the end and paste it in next time.
 
-- The Joe Rogan Experience
-- The Diary of a CEO (Steven Bartlett)
-- The Mel Robbins Podcast
-- Call Her Daddy (Alex Cooper)
-- This Past Weekend (Theo Von)
-- Huberman Lab
-- WHOOP Podcast
-- The Drive (Peter Attia)
-- Rich Roll Podcast
-- Tim Ferriss Show
-- The Shawn Ryan Show
-- Danger Close (Jack Carr)
-- Found My Fitness (Rhonda Patrick)
-- On Purpose (Jay Shetty)
+## Scheduling
 
-## Library Systems
+Full instructions are in [`podcast-book-finder/references/scheduling.md`](podcast-book-finder/references/scheduling.md). In short:
 
-The skill knows how to search these catalog systems (and will auto-detect others):
+| Platform | How |
+|----------|-----|
+| Claude desktop app | Ask Claude to create a scheduled task, or add one from the scheduled tasks list. Runs on your computer, with access to your config and a local hold server. |
+| Claude Code CLI | `claude -p "<scheduled-run prompt>"` from cron or launchd. |
+| Codex app | Create an automation whose prompt starts with `$podcast-book-finder`. |
+| Codex CLI | `codex exec "<scheduled-run prompt>"` from cron or launchd. |
+| ChatGPT | Ask ChatGPT to create a scheduled task with the portable prompt and your config. |
 
-- **BiblioCommons** (Chicago PL, and many others)
-- **CARL•Connect** (Los Angeles PL)
-- **Vega Discover** (Miami-Dade PL)
-- **Evergreen** (many state/county systems)
-- **Bibliomation/Acorn** (Connecticut libraries)
-- **OverDrive/Libby** (digital lending — nearly every US public library)
-- **Hoopla** (instant digital access, no holds)
+Scheduled runs never ask questions: they report books new since the last run, and place holds only if you chose automatic holds during setup (capped per run).
 
-If the catalog blocks automated access, it falls back to generating a search reference table you can use manually.
+## Your data
+
+On Claude and Codex, everything lives in `~/.podcast-book-finder/` (override with `PODCAST_BOOK_FINDER_HOME`):
+
+- `config.json`: your podcasts, library and preferences ([example](podcast-book-finder/config.example.json))
+- `history.json`: books already reported, and any holds placed
+- `lists/`: generated reading lists
+
+Library card numbers and PINs are never stored here; they stay in the hold server's own configuration.
 
 ## Disclosure
 
@@ -73,4 +78,4 @@ Book links to Amazon are affiliate links. As an Amazon Associate, I earn from qu
 
 ## License
 
-This project is licensed under the [GNU General Public License v3.0](LICENSE). You're free to use, modify, and distribute it — but any derivative work must also be released under GPLv3 and include the same freedoms. See the LICENSE file for full details.
+This project is licensed under the [GNU General Public License v3.0](LICENSE). You're free to use, modify, and distribute it, but any derivative work must also be released under GPLv3 and include the same freedoms. See the LICENSE file for full details.

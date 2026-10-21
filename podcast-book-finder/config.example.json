@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "podcasts": [
+    {
+      "name": "Example Podcast",
+      "archive_url": "https://example.com/feed.rss",
+      "archive_type": "rss",
+      "notes": "Feed also carries non-guest episodes; skip them.",
+      "added": "2026-10-21"
+    }
+  ],
+  "topics": [],
+  "default_timeframe": "last 3 months",
+  "amazon_links": true,
+  "output_dir": "~/.podcast-book-finder/lists",
+  "libraries": [
+    {
+      "name": "Example Public Library",
+      "catalog_url": "https://example.bibliocommons.com",
+      "catalog_system": "BiblioCommons",
+      "catalog_search_url": "https://example.bibliocommons.com/v2/search?query={query}&searchType=keyword",
+      "catalog_automated": true,
+      "digital": [
+        { "platform": "Libby/OverDrive", "url": "https://example.overdrive.com" }
+      ],
+      "preferred_formats": ["print", "ebook", "audiobook"],
+      "hold_mcp": {
+        "server": "name of the MCP server as the agent sees it",
+        "search_tool": "tool used to search the catalog",
+        "hold_tool": "tool used to place a hold",
+        "covers": ["print"],
+        "verified": "2026-10-21"
+      },
+      "hold_mode": "ask",
+      "max_auto_holds_per_run": 3
+    }
+  ],
+  "schedule": {
+    "cadence": "weekly",
+    "platform": "Claude desktop app scheduled task",
+    "created": "2026-10-21"
+  },
+  "last_run": null
+}
