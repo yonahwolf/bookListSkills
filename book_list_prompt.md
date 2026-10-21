@@ -18,14 +18,14 @@ The user's config is a JSON block like this:
   "topics": [],
   "default_timeframe": "last 3 months",
   "amazon_links": true,
-  "library": {
+  "libraries": [{
     "name": "...",
     "catalog_url": "...",
     "catalog_system": "...",
     "digital": [{ "platform": "...", "url": "..." }],
     "preferred_formats": ["print", "ebook", "audiobook"],
     "hold_connector": null
-  },
+  }],
   "seen_books": []
 }
 ```
@@ -38,7 +38,7 @@ Ask one question at a time:
 
 1. **Podcasts.** "Which podcasts do you want me to watch for author-guests?" For each one, search the web to confirm the exact show and find its episode archive (official site, RSS feed, Apple Podcasts or Spotify). Save it as `archive_url`.
 2. **Preferences.** Topics to prioritise (default none), default timeframe (default last 3 months), Amazon links (default yes). Offer the defaults together.
-3. **Library (optional).** "Do you want me to check a library?" If yes, find its online catalog and vendor (BiblioCommons, Polaris, Vega, Aspen, Evergreen, and so on) and its digital lending platforms (Libby/OverDrive, Hoopla, cloudLibrary) yourself. Ask which formats the user wants.
+3. **Libraries (optional).** "Do you want me to check a library?" The user may name several; set up each one. A town library is often part of a county system that runs the shared catalog, and a city may have several separate systems (ask which). For each, find its online catalog and vendor (BiblioCommons, Polaris, Vega, Aspen, Evergreen, and so on) and its digital lending platforms (Libby/OverDrive, Hoopla, cloudLibrary) yourself. Ask which formats the user wants.
 4. **Holds.** Check whether you have a connector or app that can reach this library or its digital platform. If not, search the web for an MCP server for the catalog vendor or platform, and tell the user what you found, noting that third-party servers act on their library account and should be reviewed before connecting. Never ask for a library card number or PIN. Without a connector, lists include hold links instead.
 5. **Save.** Print the final config as a JSON block and tell the user to keep it: paste it at the end of this prompt next time, save it in the project instructions, or ask you to remember it if memory is on.
 
@@ -54,7 +54,7 @@ Ask one question at a time:
 
 ```markdown
 # Books from [podcast names] guests
-## [Window] | Library: [name or "not configured"]
+## [Window] | Libraries: [names or "not configured"]
 
 **Podcasts searched:** [list] · **Author-guests:** [N] · **New books:** [N]
 
@@ -63,7 +63,7 @@ Ask one question at a time:
 - **Podcast episode:** [podcast, episode # / title]
 - **Topic:** [category]
 - **Description:** [1-2 sentences]
-- **Library status:** [icon + status]
+- **Library status:** [library]: [icon + status] · [library]: [icon + status]
 - **Buy on Amazon:** [link]
 - **Also by this author:** [titles]
 

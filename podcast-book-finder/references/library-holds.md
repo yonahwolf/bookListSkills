@@ -26,6 +26,8 @@ For each book, use the first method that works:
 
 1. **Hold MCP server**, if configured: search by ISBN, falling back to title and author.
 2. **The catalog directly**: fetch the catalog's search URL for the title and author. Many catalogs block automated requests; on a 403, CAPTCHA or empty JavaScript shell, stop using this method for the rest of the run.
+   - **BiblioCommons** catalogs answer a public JSON search that includes copy and hold counts: `https://gateway.bibliocommons.com/v2/libraries/<subdomain>/bibs/search?query=<title author>&searchType=smart&f_FORMAT=BK` (drop `f_FORMAT` to include ebooks and audiobooks). Read `entities.bibs.*.briefInfo` for the title and `availability` for `status`, `availableCopies`, `totalCopies` and `heldCopies`. A record with 0 total copies is usually digital-only. Link the user to `https://<subdomain>.bibliocommons.com/v2/record/<id>`.
+   - If a title isn't found, retry once with a different query (title only, or title and full author name) before marking it ❌.
 3. **Web search** scoped to the catalog: `site:<catalog domain> <author last name> <short title>`.
 4. **Digital platforms**: search each configured platform (for Libby/OverDrive, `<library>.overdrive.com/search?query=...`).
 5. **Fallback**: mark ❓ and add a row to the search reference table with a ready-made catalog search link.

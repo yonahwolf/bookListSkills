@@ -41,7 +41,7 @@ Read `config.json` and `history.json`. The search window is, in order of prefere
 
 For each configured podcast:
 
-1. Fetch its `archive_url` (saved during setup). If it fails or is missing, search for the episode list: the official site, Apple Podcasts, Spotify, or aggregators such as Podchaser, Listen Notes or Podtail. Update `archive_url` in the config if you find a better source.
+1. Fetch its `archive_url` (saved during setup) and read any `notes` saved with it. Some feed hosts reject scripted requests that lack a browser User-Agent; if a fetch returns 403, retry with one or with your web fetch tool before giving up. If it still fails or is missing, search for the episode list: the official site, Apple Podcasts, Spotify, or aggregators such as Podchaser, Listen Notes or Podtail. Update `archive_url` in the config if you find a better source.
 2. Keep only episodes inside the window. For long-running shows, "best of" and year-in-review episodes are a fast way to find notable guests.
 3. Identify guests who are authors: "author of", "bestselling author", a book title in the episode description, or academic and medical titles (they often have books). Skip solo and housekeeping episodes.
 
@@ -55,9 +55,9 @@ Search for each author-guest's books and capture title, author, publication year
 - If the config has `topics`, put matching books first and mark the rest as outside the filter instead of dropping them.
 - Drop any book already in `history.json` (match on ISBN, otherwise on normalized title and author). On an interactive run, mention how many were skipped as already seen.
 
-### 4. Check the library and offer holds
+### 4. Check libraries and offer holds
 
-If the config has a `library`, follow [references/library-holds.md](references/library-holds.md) to check availability for each book and to place or offer holds according to `hold_mode`.
+For each entry in `libraries`, follow [references/library-holds.md](references/library-holds.md) to check availability for each book and to place or offer holds according to that library's `hold_mode`. When the user has several libraries, report a status per library, and offer a hold only at one library per book (the one with the shortest wait, or the first listed).
 
 Availability statuses:
 
@@ -76,11 +76,11 @@ Always use the tag `theroadtoshod-20`; this skill ships with it built in. If the
 
 ### 6. Write the list and update state
 
-Write `lists/podcast-books-YYYY-MM-DD.md` in this format:
+Write `lists/podcast-books-YYYY-MM-DD.md` (if that file already exists from an earlier run today, add `-2`, `-3`, and so on rather than overwriting it) in this format:
 
 ```markdown
 # Books from [podcast names] guests
-## [Window] | Library: [library name or "not configured"]
+## [Window] | Libraries: [library names or "not configured"]
 
 - **Podcasts searched:** [list]
 - **Author-guests found:** [N] · **New books:** [N] · **Skipped (already seen):** [N]
@@ -93,15 +93,15 @@ Write `lists/podcast-books-YYYY-MM-DD.md` in this format:
 - **Podcast episode:** [podcast, episode # / title]
 - **Topic:** [category]
 - **Description:** [1-2 sentences]
-- **Library status:** [icon + status]
+- **Library status:** [library]: [icon + status] · [library]: [icon + status]
 - **Buy on Amazon:** [affiliate link]
 - **Also by this author:** [titles]
 
 ---
 
 ### Library search reference
-| # | Search term | Catalog link |
-|---|-------------|--------------|
+| # | Library | Search term | Catalog link |
+|---|---------|-------------|--------------|
 
 ---
 
@@ -110,7 +110,7 @@ Write `lists/podcast-books-YYYY-MM-DD.md` in this format:
 *This book list was generated using the Podcast Book Finder skill, created by [Yonah Wolf](https://yonah.name).*
 ```
 
-Include the library search reference table only for books marked ❓. The disclosure line is required whenever Amazon links appear; the attribution line always appears.
+Include the library search reference table only for books marked ❓. After it, add a short **Not included** section naming author-guests whose books were left out and why (pre-order, no published book found), so the user can tell a skipped guest from a missed one. The disclosure line is required whenever Amazon links appear; the attribution line always appears.
 
 Then append the new books to `history.json` and set `last_run` in the config to today's date. If the run found no new books, still update `last_run` and write a one-line list saying so, so scheduled runs leave a trace.
 
